@@ -9,7 +9,7 @@ Userscript designed to generate a CSV of all Access Data for a course or entire 
 - [Important Notes](#important-notes)
 
 #### Credits
-The original JavaScript was published by [James Jones]([https://community.canvaslms.com/people/msgarcia](https://community.canvaslms.com/t5/user/viewprofilepage/user-id/105160))'s course-wide version posted to the [Canvas community]([https://community.canvaslms.com/groups/canvas-developers/blog/2017/04/20/universal-student-view-button-for-teachers](https://community.canvaslms.com/t5/Higher-Ed-Users/Obtaining-and-using-Access-Report-data-for-an-entire-course/ba-p/264333)). This userscript is a completely different script that expands the behaviour of the original to the term-level, but if you like this I highly encourage you to give James a like for the original.
+The original JavaScript was published by [James Jones](https://community.canvaslms.com/t5/user/viewprofilepage/user-id/105160)'s course-wide version posted to the [Canvas community](https://community.canvaslms.com/t5/Higher-Ed-Users/Obtaining-and-using-Access-Report-data-for-an-entire-course/ba-p/264333). This userscript is a completely different script that expands the behaviour of the original to the term-level, but if you like this I highly encourage you to give James a like for the original.
 
 [Back to Top](#canvas-javascript-bulkAccessDataReport)
 
