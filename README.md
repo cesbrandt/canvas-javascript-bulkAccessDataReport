@@ -15,6 +15,9 @@ The original JavaScript was published by [James Jones](https://community.canvasl
 
 #### Changelog
 02/21/2025
+- Rewrote `enableDownload` function to fix `RangeError: Invalid string length` error when downloading a term with a large number of courses.
+
+02/21/2025
 - Initial Load
 
 [Back to Top](#canvas-javascript-bulkAccessDataReport)
