@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Canvas Bulk Access Report Data
-// @version      1.0
+// @version      1.1
 // @description  Generates a .CSV download of the access report for all students in a course
 // @match        https://*.instructure.com/accounts/*/terms
 // @match        https://*.instructure.com/accounts/*/terms?*
 // @match        https://*.instructure.com/courses/*/users
-// @updateURL     https://raw.githubusercontent.com/cesbrandt/canvas-javascript-bulkAccessDataReport/master/canvasBulkAccessDataReport.user.js
+// @updateURL    https://raw.githubusercontent.com/cesbrandt/canvas-javascript-bulkAccessDataReport/master/canvasBulkAccessDataReport.user.js
 // ==/UserScript==
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -474,78 +474,98 @@ let closeProgressBar = () => {
 };
 
 let enableDownload = report => {
-	var csvBody = [
-		[
-			'User ID',
-			'Display Name',
-			'Sortable Name',
-			'Category',
-			'Class',
-			'Title',
-			'Views',
-			'Participations',
-			'Last Access',
-			'First Access',
-			'Action',
-			'Code',
-			'Group Code',
-			'Context Type',
-			'Context ID',
-			'Login ID',
-			'Email',
-			'Section',
-			'Section ID',
-			'SIS User ID',
-			'Last Activity',
-			'Total Activity',
-			'Course Score',
-			'Course Grade',
-			'Role Type',
-			'Role',
-			'Role ID'
-		],
-		...report.map(entry => [
-			entry.user_id,
-			(entry.display_name ?? '').replaceAll('"', '""'),
-			(entry.sortable_name ?? '').replaceAll('"', '""'),
-			entry.asset_category,
-			entry.asset_class_name,
-			(entry.readable_name ?? '').replaceAll('"', '""'),
-			entry.view_score,
-			entry.participate_score,
-			entry.last_access,
-			entry.created_at,
-			entry.action_level,
-			entry.asset_code,
-			entry.asset_group_code,
-			entry.context_type,
-			entry.context_id,
-			entry.login_id,
-			(entry.email ?? '').replaceAll('"', '""'),
-			(entry.course_section_name ?? '').replaceAll('"', '""'),
-			entry.course_section_id,
-			entry.sis_user_id,
-			entry.last_activity_at,
-			entry.total_activity_time,
-			entry.current_score,
-			entry.current_grade,
-			entry.role_type,
-			entry.role,
-			entry.role_id
-		])
-	].map(values => ('"' + values.join('","')) + '"').join("\n");
+	var csvHeader = [
+		'User ID',
+		'Display Name',
+		'Sortable Name',
+		'Category',
+		'Class',
+		'Title',
+		'Views',
+		'Participations',
+		'Last Access',
+		'First Access',
+		'Action',
+		'Code',
+		'Group Code',
+		'Context Type',
+		'Context ID',
+		'Login ID',
+		'Email',
+		'Section',
+		'Section ID',
+		'SIS User ID',
+		'Last Activity',
+		'Total Activity',
+		'Course Score',
+		'Course Grade',
+		'Role Type',
+		'Role',
+		'Role ID'
+	];
 
 	var btn = document.querySelector('.ui-dialog-buttonpane .btn.btn-primary');
 	btn.classList.remove('disabled');
 	btn.setAttribute('aria-disabled', 'false');
+
 	btn.addEventListener('click', e => {
+		// Create a download link but only append it once the chunks are processed
 		var downloadLnk = document.createElement('a');
-		downloadLnk.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(csvBody));
-		downloadLnk.setAttribute('download', 'access-report.csv');
 		downloadLnk.style.display = 'none';
 		e.currentTarget.parentNode.append(downloadLnk);
+
+		// Start a Blob array to hold the CSV content in chunks
+		var blobParts = [];
+
+		// Start with the header
+		blobParts.push('"' + csvHeader.join('","') + '"\n');
+
+		// Now add data rows in chunks to avoid memory overload
+		report.forEach(entry => {
+			let row = [
+				entry.user_id,
+				(entry.display_name ?? '').replaceAll('"', '""'),
+				(entry.sortable_name ?? '').replaceAll('"', '""'),
+				entry.asset_category,
+				entry.asset_class_name,
+				(entry.readable_name ?? '').replaceAll('"', '""'),
+				entry.view_score,
+				entry.participate_score,
+				entry.last_access,
+				entry.created_at,
+				entry.action_level,
+				entry.asset_code,
+				entry.asset_group_code,
+				entry.context_type,
+				entry.context_id,
+				entry.login_id,
+				(entry.email ?? '').replaceAll('"', '""'),
+				(entry.course_section_name ?? '').replaceAll('"', '""'),
+				entry.course_section_id,
+				entry.sis_user_id,
+				entry.last_activity_at,
+				entry.total_activity_time,
+				entry.current_score,
+				entry.current_grade,
+				entry.role_type,
+				entry.role,
+				entry.role_id
+			];
+
+			// Append this row to the Blob parts as a chunk
+			blobParts.push('"' + row.join('","') + '"\n');
+		});
+
+		// Create the Blob with the chunks of CSV data
+		var csvBlob = new Blob(blobParts, { type: 'text/csv;charset=utf-8;' });
+
+		// Create a download link and trigger the download
+		downloadLnk.setAttribute('href', URL.createObjectURL(csvBlob));
+		downloadLnk.setAttribute('download', 'access-report.csv');
 		downloadLnk.click();
-		e.currentTarget.parentNode.removeChild(downloadLnk)
+
+		// Clean up after the download
+		e.currentTarget.parentNode.removeChild(downloadLnk);
 	});
 };
 
